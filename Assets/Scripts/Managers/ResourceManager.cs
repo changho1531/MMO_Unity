@@ -30,7 +30,9 @@ public class ResourceManager
             return null;
         }
 
-        // 2. 혹시 폴링된 애가 있을까
+        if(original.GetComponent<Poolable>() != null)
+            return Managers.Pool.Pop(original,parent).gameObject;
+
         GameObject go = Object.Instantiate(original, parent);
         go.name = original.name;
 
@@ -42,7 +44,12 @@ public class ResourceManager
         if (go == null)
             return;
 
-        // 만약에 풀링이 필요한 아이라면 -> 풀링 매니저에 위탁
+        Poolable poolable = go.GetComponent<Poolable>();
+        if (poolable != null)
+        {
+            Managers.Pool.Push(poolable);
+            return;
+        }
         Object.Destroy(go);
     }
 }
